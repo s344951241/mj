@@ -1,0 +1,14 @@
+--登陆
+send Login.LoginReq {account="123",token="sss"}
+
+--获取房间列表
+send Room.RoomListReq {}
+
+--登陆房间
+send Room.EnterReq {room_id=1}
+
+--匹配
+send Table.MatchReq {}
+
+--准备
+send Table.ReadyReq {}

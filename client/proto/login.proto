@@ -1,0 +1,43 @@
+package Login;
+
+message LoginReq //缺sex
+{
+	required string account = 1; //openid,
+	required string name = 2;
+	required string url = 3;
+    required int32 sex = 4;
+    required bool guest_mode = 5;
+    required string password = 6;
+    required string version = 7;
+    required string client_os = 8;
+}
+
+message LoginRsp
+{
+	required int32 id = 1;
+	required int32 money = 2;
+    required int32 extmoney = 3; //每日登陆奖励金币,用做提示奖励
+    required int32 usertype = 4; //用户类型 ,0为普通用户
+    required int32 err_no = 5; //1-密码错误，一般出现在ios游客模式， 2-版本不一致，跳到 url
+}
+
+message CheckVerReq
+{
+	required string client_os = 1;
+    required string version = 2;
+}
+
+message CheckVerRsp
+{
+	required bool guest_mode = 1;
+    required bool version_match = 2;
+}
+
+message IOS_RegistReq{
+    required string username = 1;
+    required string password = 2;
+}
+
+message IOS_RegistRsp{
+    required int32 errno = 1;
+}

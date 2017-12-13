@@ -1,0 +1,2 @@
+F:\sl\mj_client\Assets\Scripts\protobuf-net\obj\Debug\protobuf-net.csprojResolveAssemblyReference.cache
+F:\sl\mj_client\Assets\Scripts\protobuf-net\obj\Debug\protobuf-net.dll

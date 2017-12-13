@@ -1,0 +1,556 @@
+package Table;
+
+// 创建桌子
+message CreateReq{
+	required string token = 1;
+	required int32 playoffs = 2;
+	required int32 times = 3;
+	required int32 jiangma = 4;
+	required int32 maima = 5;
+}
+
+// 创建返回
+message CreateRsp{
+	required int32 tab_id = 1;
+}
+
+// 加入桌子
+message JoinReq {
+	required int32 tab_id = 1;
+}
+
+message ReJoinReq{
+	required int32 tab_id = 1;	
+}
+
+message Rule{
+	required int32 totalround = 1; //总局数
+	required int32 maxbet = 2; //封顶
+	required int32 jiangma = 3; //奖码设置，0代表无
+	required int32 maima = 4; //买马设置
+
+}
+
+message ReJoinRsp{
+	required int32 err_no = 1;
+	required int32 owner = 2;
+	required int32 tab_id = 3;
+	required int32 is_playing = 4; // 0--准备状态，1--牌局状态，2--牌局过度状态
+	required Rule rule = 5;
+	repeated Role roles = 6;
+	repeated EndCards end_cards = 7;
+	repeated PlayerRecords player_record = 8;
+	required int32 cur_id = 9;//当前出牌者，和自己相同，则处于出牌状态
+	required int32 cur_round = 10;//当前第几局
+	required int32 cur_card = 11;//最后打出的牌
+	required int32 left_card = 12;//剩余牌
+}
+
+//加入桌子返回给所有其他人
+message Join{
+	required int32 id = 1;
+	required Role role = 2;
+}
+
+// 加入返回给加入者
+message JoinRsp{
+	required int32 err_no = 1;
+	required int32 owner = 2; //房主id
+	required Rule rule = 3;
+	repeated Role roles = 4;
+
+}
+
+//系统错误
+message SysErrorRsp{
+	required string err_info = 1;
+	required int32 err_type = 2; // 0 --提示， 1--警告， 2--错误 
+}
+
+//退出桌子
+message QuitReq{
+	required int32 id = 1;
+}
+//通知客户端谁离开了，离开时别人的话，显示空位，自己的话，关闭窗口
+message QuitRsp{
+	required int32 id = 1;
+	required int32 quit_type = 2;//1-- 自己离开， 2--被踢， 3--房间解散
+}
+//踢人
+message KickReq{
+	required int32 id = 1;
+}
+
+message KickRsp{
+	required int32 id = 1;
+	required int32 err_no = 2;
+}
+
+message Role {  
+  required int32 id = 1;  
+  required string name = 2; 
+  required int32 pos = 3;
+  required bool ready = 4;
+  required bool online = 5;
+  required string url = 6;
+  required int32 sex = 7;
+}
+
+message ReadyNextReq{
+	
+}
+
+message ReadyNextRsp{
+	required int32 id = 1;
+}
+
+// 准备
+message ReadyReq{
+
+}
+
+// 准备结果
+message Ready{
+	required int32 id = 1;
+}
+
+//status = 1,代表开始一局，2代表结束一局，3代表流局，id代表本局的庄家，round代表第几局
+message Start{
+	required int32 status = 1;
+	required int32 id = 2;
+	required int32 round = 3;
+	repeated PlayerRecords player_record = 4;
+}
+
+// 发牌
+message Cards{
+	repeated int32 cards = 1;
+}
+
+// 本轮操作人
+message Turn{
+	required int32 id = 1;
+}
+
+// 打牌
+message Play{
+	required int32 id = 1;
+	required int32 card = 2;
+	repeated int32 leftcard = 3;//此人剩余牌数
+	repeated int32 outcards = 4;
+	repeated PGData pgdata = 5;
+	required int32 err_no = 6;
+}
+
+
+// 碰
+message Peng{
+	required int32 id = 1;
+	required int32 from = 2;
+	required int32 card = 3;
+	required int32 err_no = 4;
+	repeated PGData pgdata = 5;
+	repeated int32 leftcard = 6;
+	required int32 nextcard = 7;
+}
+
+// 暗杠
+message Angang{
+	required int32 id = 1;
+	required int32 card = 3;
+}
+
+// 杠 from == id的话则认为是暗杠，此时自己知道card内容，别人card=0
+message Gang{
+	required int32 id = 1;
+	required int32 from = 2;
+	required int32 card = 3;
+	required int32 err_no = 4;
+	repeated PGData pgdata = 5;
+	repeated int32 leftcard = 6;
+}
+
+
+// 胡
+message Hu{
+	required int32 id = 1;
+	required int32 from = 2;
+	required int32 hutype = 3;
+	required int32 err_no = 4;
+	required int32 card = 5;
+	repeated int32 cards = 6;
+	required int32 exttype = 7;
+	
+}
+
+message CanHu{
+	required int32 id = 1;
+}
+
+message PassCountRsp{
+	required string value = 1;
+}
+
+// 过
+message Pass{
+	required int32 id = 1;	
+	required bool auto = 2;
+	required int32 passcard = 3;
+}
+
+//有人胡了之后，检测自己能不能胡，不能胡就马上发PassHu给服务器，以马上结束本局
+message PassHu{
+	required int32 id = 1;
+}
+
+message FixCards{
+	required int32 id = 1;
+	repeated int32 leftcard = 2;
+}
+
+
+// 摸底牌
+message NewCard{
+	required int32 card = 1;
+	required int32 id = 2;
+	required int32 leftcard = 3;//桌面剩余牌数
+	repeated int32 myleftcard = 4; //发生相公牌强行刷新，大部分时间为空，为空什么都不做，有值强行刷新
+	//required int32 counter = 4; //计数倒计时
+}
+
+
+//客户端切换成自动打牌标志
+message SwitchAuto{
+	required int32 id = 1;
+	required bool isauto = 2;
+	required int32 cur_id = 3;//当前出牌者，和自己相同，则处于出牌状态
+}
+
+message ChangeAutoReq{
+	required int32 id = 1;
+}
+
+//取消自动打牌，客户端如果正在自动打牌，发起后则取消自动
+message CancelAutoReq{
+	required int32 id = 1;
+}
+
+
+//语音
+message VoiceChat{
+	required int32 id = 1;
+	required int32 index = 2;
+	required bytes data = 3;
+}
+
+//快捷消息
+message QuickMsg{
+	required int32 id = 1;
+	required int32 msgid = 2;
+}
+
+
+//买马,返回给客户度啊
+message MaiMa{
+ 	repeated MaiMaData maima_list = 1;	//各自码的详情
+ 	repeated int32 cardsAll = 2;
+ 	repeated MaiMaScore maima_score1 = 3;	//买马各自分数
+ 	repeated MaiMaScore maima_score2 = 4;	//买马各自分数
+}
+
+//买马结构 ,因为只会买1马或买2马的设置，所以写死两个不用repeated
+message MaiMaData{
+	required int32 id = 1;
+	required int32 card1 = 2;
+	required int32 card2 = 3;
+}
+
+message MaiMaScore {
+	required int32  id = 1;
+	required int32  card = 2;
+	required int32	targetid = 3;
+	required int32	score = 4;
+}
+
+
+
+//奖码，返回给客户端
+message JiangMa{
+	repeated int32 cards = 1;
+	repeated int32 cardsAll = 2;
+}
+
+//本局分数
+message RoundScore{
+	repeated Score scores = 1;
+	repeated EndCards end_cards = 2;
+	required int32 end_type = 3; //1 --正常胡牌结算， 2--流局结算
+	required int32 round_id = 4;//第几局
+	required string starttime = 5;
+	required string lianzhuang = 6; // "1000,2" 代表1000id这个，连庄两次，分数则表示2*3,其他人-2, "0,0"代表没连庄
+	required int32 exttype = 7; //特殊显示， 0-代表默认，1-代表海底捞月，2-代表杠上爆，3-代表杠上花，1,2在自摸人的结算分后加个（海底捞月）这样子，杠上花就在被胡的人上面加（杠上花）
+}
+
+
+//最后所有人的翻牌,
+message EndCards{
+	required int32 id = 1;
+	repeated int32 cards = 2;
+	repeated PGData pgdata = 3;
+	repeated int32 outcards = 4; //打出去的牌
+	//repeated int32 pengcards = 3;
+	//repeated int32 gangcards = 4;
+}
+
+message Score{
+	required int32 id = 1;
+	required int32 hu = 2; //1-胡，2、放炮，0、nothing，3,自摸
+	required int32 hu_type = 3;// 对对胡，清一色
+	required int32 score = 4; //总分
+	required int32 basescore = 5; //基础胡分
+	repeated int32 jiangma = 6;	//奖码列表
+}
+
+//ptype ==0, peng, 1,gang, 2,angang, 3,bugang from为执行目标，暗杠为自己id， 有目标则是杠的对象，card是哪张牌
+//碰或杠的数据结构,{ptype = 1, from = gang_from, card = msg.card}
+message PGData{
+	required int32 ptype = 1;
+	required int32 from = 2;
+	required int32 card = 3;
+}
+
+message GameEnd{
+	required int32 id = 1;//收到EndScore代表本桌子游戏结束，退回大厅 
+	repeated PlayerRecords player_records = 2;
+	required int32 index = 3;
+}
+
+
+//玩家本次游戏总结算
+message PlayerRecords{
+	required int32 id = 1;
+	required int32 zm_count = 2; //自摸次数
+	required int32 dp_count = 3; //点炮次数
+	required int32 hp_count = 4;  //胡牌
+	required int32 ag_count = 5;  //暗杠
+	required int32 mg_count = 6; //明杠 
+	required int32 mm_count = 7; //码数
+	required int32 total_score = 8; //总分数
+}
+
+
+//金钱发生变化，刷新客户端金币数
+message MoneyChange{
+	required int32 mymoney = 1;
+}
+
+
+message HeartbeatReq{
+	required int32 id = 1;
+}
+
+//查看历史分数记录 ,
+message HistoryTableReq{   
+	required int32 id = 1;
+	required int32 page = 2;
+}
+
+message HistoryTableRsp{
+	required int32 id = 1;	//这个人当前查询页面的的历史列表
+	required int32 page = 2;
+	required int32 maxpage = 3;
+	repeated HistoryTable table_list = 4;
+}
+
+message HistoryTable{ //桌子简写，再根据index查询对应桌子详细内容
+	required int32 index = 1;
+	required int32 table_id = 2;
+	required int32 owner_id = 3;
+	required string start_time = 4;
+	required string end_time = 5;	
+	repeated HistoryTablePlayerinfo playerinfo_list = 6;
+}
+
+message HistoryTablePlayerinfo{
+	required int32 id = 1;
+	required string name = 2;
+	required int32 total_score = 3;
+	required string url = 4;
+	required int32 pos = 5;
+}
+
+
+message HistoryTableDetailReq{ //查询某桌子的详细对局内容
+	required int32 index = 1; //分数索引, score_id
+}
+
+message HistoryTableDetailRsp{
+	required int32 index = 1;
+	repeated RoundScore round_score_list = 2;
+	repeated HistoryMaiMa maima_list = 3;
+	repeated HistroyJiangMa jiangma_list = 4; //每局开的2,5,8奖马列表，具体奖了哪个读RoundScore的Score的jiangma
+}
+
+
+
+message HistoryMaiMa{
+	required int32	round_id = 1; //局id
+	repeated MaiMaDataNew maima_list = 2;	//各自码的详情
+}
+
+
+message HistroyJiangMa{
+	required int32 round_id = 1; //局id
+	repeated int32 jiangma_list = 2;	
+}
+
+message MaiMaDataNew{
+	required int32 id = 1;
+	required int32 card1 = 2;
+	required int32 card2 = 3;
+	required int32 zhong1 = 4; // 1 代表，中了加分，，-1代表，中了扣分，0，不中
+	required int32 zhong2 = 5;
+}
+
+
+
+//重连后返回信息
+message ReconnectRsp{
+	
+}
+
+
+//停服维护，发给服务器后就不可以创建房间了，stop = true，代表停服，stop代表又开
+message GMStopServerReq{
+	required bool stop = 1;
+}
+
+//GM命令查询用户信息,查看单个用户，代理也用，返回的是GMPlayerInfoRsp, 只有长度为一单个GMPlayerInfo
+message GMQuerySinglePlayerReq{
+	required int32 id = 1;
+}
+
+
+//GM专用,查看所有代理人，一行行输出在客户端textfiled，返回的是GMPlayerInfoRsp, 内容是GMPlayerInfo列表
+message GMQueryAgentListReq{
+	
+}
+
+//GM专用,查看金币大于多少的玩家，一行行输出在客户端textfiled，返回的是GMPlayerInfoRsp, 是GMPlayerInfo列表
+message GMQueryPlayerListReq{
+	required int32 money = 1;
+}
+
+//查询某人id的加钱操作日志，一行行输出在客户端textfiled，返回GMMoneyLogRsp GMMoneyLog列表
+//is_active == true代表看此人主动给人加钱的记录，== false查看，被人加钱的记录
+message GMQueryMoneyLogReq{
+	required int32 id = 1;
+	required bool is_active = 2;
+	required int32 startindex = 3;//从第几条开始查
+}
+
+
+//根据流水号，查看单条流水日志,返回GMMoneyLogRsp,单条 GMMoneyLog
+message GMQuerySingleGMLogReq{
+	required int32 index = 1;
+}
+
+//GM命令给玩家增加金币，代理也用这个指令
+message GMAddMoneyReq{
+	required int32 id = 1;
+	required int32 value = 2;
+}
+
+//加钱操作码
+message GMAddMoneyRsp{
+	required int32 err_no = 1;
+}
+
+//GM指令，添加代理
+message GMAddAgentReq{
+	required int32 id = 1;
+	required bool yes = 2; //yes = true代表加为代理，false代表取消代理
+}
+
+message GMPlayerInfo{
+	required int32 id = 1;
+	required string name = 2;
+	required int32 total_money = 3;//身上总共多少钱，代理看不到，GM可以看到
+	required bool is_agent = 4; //是否代理人
+}
+
+message GMMoneyLog{
+	required int32 index = 1;//流水号
+	required int32 fromid = 2; //谁加的钱
+	required int32 fromname = 3; //谁的名字
+	required int32 toid = 4; //给谁加钱
+	required string toname = 5;//给谁名字
+	required int32 value = 6; //加多少钱
+	required string optime = 7;//操作时间
+}
+
+message GMPlayerInfoRsp{
+	repeated GMPlayerInfo player_info_list = 1;
+}
+
+message GMMoneyLogRsp{
+	repeated GMMoneyLog money_log_list = 1;
+}
+
+//GM命令查看在线人数和桌子数
+message GMQuerySysInfoReq{
+	required string password = 1;
+}
+
+message GMQuerySysInfoRsp{
+	//required int32 tablecount = 1;
+	repeated int32 tablelist = 1;
+}
+
+message GMDestroyRoomReq{
+	required int32 tabid = 1;
+}
+
+message IOS_PurchaseReq{
+	required int32 purchase_id = 1;
+}
+
+message IOS_RegistReq{
+	required string username = 1;
+	required string password = 2;
+}
+
+message IOS_RegistRsp{
+	required int32 errno = 1;
+}
+
+message ShowOfflineRsp{
+	required int32 id = 1;
+	required bool yes = 2;
+}
+
+message VoteQuitReq{
+	required bool yes = 2;	
+}
+//投票退出
+message VoteQuitRsp{
+	required int32 id = 1;
+	required bool yes = 2;
+}
+
+//发起投票
+message StartVoteReq{
+	required bool yes = 2;	
+}
+
+message StartVoteRsp{
+	required int32 id = 1;
+}
+
+
+
+
+
+
+
+
