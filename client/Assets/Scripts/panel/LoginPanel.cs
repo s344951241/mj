@@ -41,11 +41,11 @@ public class LoginPanel : BasePanel {
     public override void InitPanel(Transform uiSprite)
     {
         base.InitPanel(uiSprite);
-        _login = uiSprite.FindChild("Button").GetComponent<Button>();
-        _guestLogin = uiSprite.FindChild("Button1").GetComponent<Button>();
+        _login = uiSprite.Find("Button").GetComponent<Button>();
+        _guestLogin = uiSprite.Find("Button1").GetComponent<Button>();
        
-        _guestZc = uiSprite.FindChild("zcBtn").GetComponent<Button>();
-        _toggle = uiSprite.FindChild("info/Toggle").GetComponent<Toggle>();
+        _guestZc = uiSprite.Find("zcBtn").GetComponent<Button>();
+        _toggle = uiSprite.Find("info/Toggle").GetComponent<Toggle>();
         _toggle.isOn = PlayerPrefs.HasKey("check") ? true : false;
 
 
@@ -90,9 +90,9 @@ public class LoginPanel : BasePanel {
             PlayerPrefs.SetInt("check", 1);
             //_toggle.isOn = !_toggle.isOn;
         });
-        _version = uiSprite.FindChild("version").GetComponent<Text>();
-       _accInput = uiSprite.FindChild("acc").GetComponent<InputField>();
-        _nameInput = uiSprite.FindChild("name").GetComponent<InputField>();
+        _version = uiSprite.Find("version").GetComponent<Text>();
+       _accInput = uiSprite.Find("acc").GetComponent<InputField>();
+        _nameInput = uiSprite.Find("name").GetComponent<InputField>();
 #if UNITY_EDITOR
         _accInput.gameObject.SetActive(true);
         _nameInput.gameObject.SetActive(true);
@@ -199,13 +199,14 @@ public class LoginPanel : BasePanel {
         Debug.Log("Start Loading...");
         NetClient network = NetClient.Instance();
         //network.Connect("123.207.241.224",8888);
-       // network.Connect("127.0.0.1", 8888);
+        // network.Connect("127.0.0.1", 8888);
         //network.Connect("192.168.0.2", 8888);
-       //network.Connect("123.207.107.11", 8888);
+        //network.Connect("123.207.107.11", 8888);
         // network.Connect("192.168.0.106", 8888);
         //network.Connect("mja.ledounet.com", 8888);
 #if UNITY_ANDROID
-        network.Connect("mjcsa.ledounet.com",8888);
+        //network.Connect("mjcsa.ledounet.com",8888);
+        network.Connect("120.24.170.229",23526);
 #elif UNITY_IPHONE
         network.Connect("mjios.ledounet.com", 8888);
 #endif
